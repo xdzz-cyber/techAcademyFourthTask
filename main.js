@@ -33,9 +33,9 @@ class HttpService {
     }
 }
 
-class Worker extends HttpService {
+class Worker{
     constructor() {
-        super();
+        this.httpService = new HttpService()
         this.getAllApiPath = "https://reqres.in/api/users";
         this.getOneApiPath = "https://reqres.in/api/users/:id";
         this.createOneApiPath = "https://reqres.in/api/users";
@@ -47,12 +47,12 @@ class Worker extends HttpService {
         if (existingItem) {
             return existingItem;
         }
-        return await super.makeRequest(this.getOneApiPath.replace(":id", id), {id});
+        return await this.httpService.makeRequest(this.getOneApiPath.replace(":id", id), {id});
     }
 
     async getAll() {
         if(this.state.length === 0){
-            this.state = await super.makeRequest(this.getAllApiPath);
+            this.state = await this.httpService.makeRequest(this.getAllApiPath);
         }
         return this.state;
     }
@@ -64,7 +64,7 @@ class Worker extends HttpService {
             email: `dummy_email_${id}`
         };
         this.state.push(newItem);
-        return super.makeRequest(this.createOneApiPath, newItem, "POST");
+        return this.httpService.makeRequest(this.createOneApiPath, newItem, "POST");
     }
 }
 
@@ -76,7 +76,7 @@ class UserInterfaceHandler {
         })))
     }
 
-    static renderOneItemOnPage(item) {
+    static renderOneItemOnPage(item = {}) {
         const { email, id } = item
         singleItemResult.textContent = JSON.stringify({ email, id })
     }
@@ -90,7 +90,7 @@ class UserInterfaceHandler {
     }
 }
 
-class EventListenersHandler {
+class EventHandler {
     constructor() {
         this.worker = new Worker();
         this.data = "";
@@ -98,9 +98,7 @@ class EventListenersHandler {
     }
 
     bindEvents() {
-        getAllItemsButton.addEventListener("click", this.handleGetAllItemsClick.bind(this));
-        getOneItemButton.addEventListener("click", this.handleGetOneItemClick.bind(this));
-        addSingleItemButton.addEventListener("click", this.handleAddSingleItemClick.bind(this));
+        throw new Error('Method bindEvents must be implemented by child class');
     }
 
     async handleGetAllItemsClick(e) {
@@ -113,9 +111,11 @@ class EventListenersHandler {
 
         if (!id) {
             UserInterfaceHandler.setErrorMessage("Id should not be empty");
+            UserInterfaceHandler.renderOneItemOnPage({})
             return;
         } else if (id <= 0 || id > maxAmountOfApiItems) {
             UserInterfaceHandler.setErrorMessage("Id should be between 1 and 12");
+            UserInterfaceHandler.renderOneItemOnPage({})
             return;
         }
 
@@ -134,4 +134,12 @@ class EventListenersHandler {
     }
 }
 
-new EventListenersHandler()
+class ItemEventHandler extends EventHandler {
+    bindEvents() {
+        getAllItemsButton.addEventListener("click", this.handleGetAllItemsClick.bind(this));
+        getOneItemButton.addEventListener("click", this.handleGetOneItemClick.bind(this));
+        addSingleItemButton.addEventListener("click", this.handleAddSingleItemClick.bind(this));
+    }
+}
+
+new ItemEventHandler().bindEvents()
