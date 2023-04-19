@@ -101,12 +101,12 @@ class EventHandler {
         throw new Error('Method bindEvents must be implemented by child class');
     }
 
-    async handleGetAllItemsClick(e) {
+    async handleGetAllItemsClick() {
         this.data = await this.worker.getAll();
         UserInterfaceHandler.renderAllItemsOnPage(this.data);
     }
 
-    async handleGetOneItemClick(e) {
+    async handleGetOneItemClick() {
         const id = findItemIdInput.value;
 
         if (!id) {
@@ -124,7 +124,7 @@ class EventHandler {
         UserInterfaceHandler.renderOneItemOnPage(this.data);
     }
 
-    async handleAddSingleItemClick(e) {
+    async handleAddSingleItemClick() {
         try {
             this.data = await this.worker.createOne();
             UserInterfaceHandler.renderCreatedItemOnPage(this.data);
