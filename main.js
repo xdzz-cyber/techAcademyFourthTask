@@ -8,6 +8,9 @@ const addSingleItemButton = document.querySelector(".addSingleItemButton");
 const newSingleItemElement = document.querySelector(".newSingleItemElement");
 
 const maxAmountOfApiItems = 12;
+const getAllApiPath = "https://reqres.in/api/users";
+const getOneApiPath = "https://reqres.in/api/users/:id";
+const createOneApiPath = "https://reqres.in/api/users";
 
 class HttpService {
     async makeRequest(apiPath, params = {}, methodType = "GET") {
@@ -36,9 +39,6 @@ class HttpService {
 class Worker{
     constructor() {
         this.httpService = new HttpService()
-        this.getAllApiPath = "https://reqres.in/api/users";
-        this.getOneApiPath = "https://reqres.in/api/users/:id";
-        this.createOneApiPath = "https://reqres.in/api/users";
         this.state = [];
     }
 
@@ -47,12 +47,12 @@ class Worker{
         if (existingItem) {
             return existingItem;
         }
-        return await this.httpService.makeRequest(this.getOneApiPath.replace(":id", id), {id});
+        return await this.httpService.makeRequest(getOneApiPath.replace(":id", id), {id});
     }
 
     async getAll() {
         if(this.state.length === 0){
-            this.state = await this.httpService.makeRequest(this.getAllApiPath);
+            this.state = await this.httpService.makeRequest(getAllApiPath);
         }
         return this.state;
     }
@@ -64,7 +64,7 @@ class Worker{
             email: `dummy_email_${id}`
         };
         this.state.push(newItem);
-        return this.httpService.makeRequest(this.createOneApiPath, newItem, "POST");
+        return this.httpService.makeRequest(createOneApiPath, newItem, "POST");
     }
 }
 
